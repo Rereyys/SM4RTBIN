@@ -5,9 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Penjaga, TongSampah, SesiAbsensi, LogPemilahan
 
-def index(name):
-    return render(name, 'core/index.html')
-
 def index(request):
     return render(request, 'penjaga/index.html')
 
