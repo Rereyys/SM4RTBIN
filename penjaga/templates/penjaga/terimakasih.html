@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi Absensi Berhasil | SM4RTBIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Share+Tech+Mono&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #0f172a; 
+        }
+        .window-title { 
+            font-family: 'Comfortaa', cursive; 
+        }
+        .mono-text { 
+            font-family: 'Share Tech Mono', monospace; 
+        }
+        .desktop-bg {
+            background-color: #0f172a;
+            background-image: radial-gradient(rgba(30, 41, 59, 0.5) 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="desktop-bg min-h-screen flex items-center justify-center p-4 select-none">
+
+    <div class="w-full max-w-md bg-slate-900 border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
+        
+        <div class="bg-slate-800 px-4 py-3 flex justify-between items-center border-b border-slate-700">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs text-slate-400 font-semibold ml-2 window-title">SM4RTBIN: status_sukses.sys</span>
+            </div>
+        </div>
+
+        <div class="p-8 text-center bg-slate-950">
+            <div class="text-7xl mb-4 animate-pulse">♻️</div>
+            
+            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">TERIMA KASIH</h1>
+            <p class="text-xs text-emerald-400 font-mono mb-6">[LOG]: Sesi Tugas Jaga Berhasil Disubmit</p>
+            
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-left space-y-3 mb-6">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Status Absen</span>
+                    <span class="text-[10px] bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold px-2 py-0.5 rounded font-mono">SUCCESS_200</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-400 font-mono">Waktu Log</span>
+                    <span class="text-xs font-bold text-white mono-text" id="current-time">--:-- WIB</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-400 font-mono">Tanggal</span>
+                    <span class="text-xs font-bold text-white mono-text" id="current-date">--/--/----</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <a href="/" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl border border-emerald-400 shadow-[0_4px_0_0_#047857] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#047857] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 text-sm cursor-pointer">
+                    <i class="fa-solid fa-power-off"></i> Kembali ke Menu Utama
+                </a>
+                <p class="text-[10px] text-slate-500 font-mono">
+                    Laman sistem ini aman untuk langsung ditutup.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('current-time').innerText = `${hours}:${minutes}:${seconds} WIB`;
+    
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            document.getElementById('current-date').innerText = now.toLocaleDateString('id-ID', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
