@@ -7,4 +7,6 @@ urlpatterns = [
     path('api/start-sesi/', views.start_sesi, name='start_sesi'),
     path('api/scan-tong/', views.scan_tong, name='scan_tong'),
     path('api/submit-sesi/', views.submit_sesi, name='submit_sesi'),
+
+    path('api/sukses/', views.absensi_sukses, name='absensi_sukses'),
 ]
