@@ -1,0 +1,85 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Sm4rtbin Control Panel{% endblock %}
+
+{% block extrastyle %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body, #container { 
+        background-color: #090d16 !important;
+        color: #e2e8f0 !important; 
+        font-family: 'Inter', sans-serif !important;
+        min-height: 100vh;
+    }
+
+    #header { 
+        background: #0f172a !important; 
+        border-bottom: 1px solid #1e293b !important;
+        padding: 14px 24px !important;
+    }
+
+    #branding h1 { 
+        font-family: 'JetBrains Mono', monospace !important; 
+        color: #f8fafc !important; 
+        font-size: 16px !important; 
+        font-weight: 600 !important;
+    }
+    #branding h1 a { color: #f8fafc !important; }
+    #branding h1 span { color: #10b981; }
+
+    .breadcrumbs { 
+        background: #090d16 !important; 
+        border-bottom: 1px solid #1e293b !important;
+        color: #64748b !important; 
+        padding: 12px 24px !important;
+        font-size: 12px !important;
+        font-weight: 500;
+    }
+    .breadcrumbs a { color: #38bdf8 !important; }
+    .breadcrumbs a:hover { text-decoration: underline !important; }
+
+    #user-tools { color: #94a3b8 !important; font-size: 12px !important; }
+    #user-tools a { color: #f43f5e !important; font-weight: 600; }
+
+    div.module { 
+        background: #0f172a !important; 
+        border: 1px solid #1e293b !important;
+        border-radius: 12px !important; 
+        overflow: hidden !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .module h2, .module caption { 
+        background: #1e293b !important; 
+        color: #f1f5f9 !important; 
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: #10b981 !important;
+        color: #020617 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 8px 16px !important;
+        border: none !important;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .button:hover, input[type=submit]:hover { background: #059669 !important; }
+</style>
+{% endblock %}
+
+{% block branding %}
+<div id="branding">
+    <h1>SMARTBIN<span> // </span>CONTROL_PANEL</h1>
+</div>
+{% endblock %}
