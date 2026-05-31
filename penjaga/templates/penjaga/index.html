@@ -1,0 +1,510 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SM4RTBIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Share+Tech+Mono&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; }
+        .window-title { font-family: 'Comfortaa', cursive; }
+        .mono-text { font-family: 'Share Tech Mono', monospace; }
+        
+        .desktop-bg {
+            background-color: #0f172a;
+            background-image: radial-gradient(rgba(30, 41, 59, 0.5) 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        .draggable-window {
+            position: absolute;
+            z-index: 50;
+            cursor: move;
+        }
+        .draggable-window .content-area {
+            cursor: default;
+        }
+    </style>
+</head>
+<body class="desktop-bg min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden select-none">
+
+    <div id="menu-screen" class="w-full max-w-md bg-slate-900 border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
+        <div class="bg-slate-800 px-4 py-3 flex justify-between items-center border-b border-slate-700">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs text-slate-400 font-semibold ml-2 window-title">SM4RTBIN: koordinate.</span>
+            </div>
+        </div>
+        <div class="p-8 text-center">
+            <div class="text-7xl mb-4">♻️</div>
+            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">SM4RTBIN</h1>
+            <p class="text-sm text-slate-400 mb-8">Sistem Absensi Penjaga Pemilahan Sampah</p>
+            
+            <button onclick="mulaiAplikasi()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl border border-emerald-400 shadow-[0_4px_0_0_#047857] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#047857] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 text-lg">
+                <i class="fa-solid fa-power-off"></i> Mulai Tugas Jaga
+            </button>
+        </div>
+    </div>
+
+    <div id="main-page" class="hidden w-full max-w-4xl bg-slate-900 border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+        <div class="bg-slate-800 px-4 py-3 flex justify-between items-center border-b border-slate-700">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onclick="kembaliKeMenu()"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500 opacity-50"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500 opacity-50"></span>
+                <span class="text-xs text-slate-300 font-bold ml-2 window-title"><i class="fa-solid fa-display mr-1"></i> Sesi_Absensi_Tim_Penjaga.exe</span>
+            </div>
+            <button onclick="bukaJendelaInfo()" class="w-6 h-6 rounded-md bg-slate-700 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center transition-colors shadow">
+                <i class="fa-solid fa-question"></i>
+            </button>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-950">
+            
+            <div class="md:col-span-2 space-y-4">
+                <div id="notifikasi" class="p-3 rounded-lg border text-xs font-mono tracking-wide hidden"></div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-4">
+                    <div class="border-b border-slate-800 pb-2">
+                        <span class="text-xs text-emerald-400 font-mono">[STEP 01] Registrasi Petugas</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div id="box-p1" class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 transition-all">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-[10px] text-emerald-500 font-bold uppercase tracking-wider">Petugas 1</label>
+                                <span id="badge-role-p1" class="hidden text-[9px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-bold"></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="rfid_p1" class="w-full bg-transparent text-white font-bold text-sm focus:outline-none placeholder-slate-700" placeholder="Scan / Ketik No RFID...">
+                                <button id="btn-submit-p1-manual" onclick="handleManualInput(1)" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded transition-all">Cek</button>
+                            </div>
+                            <div id="role-p1-options" class="grid grid-cols-2 gap-1.5 pt-1 hidden">
+                                <button onclick="setPeranTugas(1, 'Pencatat')" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all">Pencatat</button>
+                                <button onclick="setPeranTugas(1, 'Pengawas')" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all">Pengawas</button>
+                            </div>
+                        </div>
+
+                        <div id="box-p2" class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 opacity-30 transition-all">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Petugas 2</label>
+                                <span id="badge-role-p2" class="hidden text-[9px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-bold"></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="rfid_p2" class="w-full bg-transparent text-white font-bold text-sm focus:outline-none placeholder-slate-800" placeholder="Menunggu Petugas 1..." readonly>
+                                <button id="btn-submit-p2-manual" onclick="handleManualInput(2)" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded transition-all">Cek</button>
+                            </div>
+                            <div id="role-p2-options" class="grid grid-cols-2 gap-1.5 pt-1 hidden">
+                                <button onclick="setPeranTugas(2, 'Pencatat')" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all">Pencatat</button>
+                                <button onclick="setPeranTugas(2, 'Pengawas')" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold py-1.5 px-2 rounded transition-all">Pengawas</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="card-tong" class="bg-slate-900 border border-slate-800 p-4 rounded-xl opacity-30 transition-all">
+                    <div class="border-b border-slate-800 pb-2 mb-3">
+                        <span class="text-xs text-amber-400 font-mono">[STEP 02] Pemindaian Barcode Tong</span>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-2">
+                        <input type="text" id="barcode_tong" class="bg-transparent text-white font-bold text-sm focus:outline-none placeholder-slate-700 w-full" placeholder="Menunggu verifikasi kedua petugas..." readonly>
+                        <button id="btn-submit-tong-manual" onclick="handleTongManual()" class="hidden bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded transition-all">Input</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-center">
+                    <span class="block text-[10px] text-slate-500 font-bold uppercase mb-1">Total Terdata</span>
+                    <div class="mono-text text-5xl font-black text-emerald-500" id="counter-tong">0</div>
+                    <span class="text-xs text-slate-400 font-bold">Tong Sampah</span>
+                </div>
+
+                <div id="box-kamera" class="bg-slate-900 border border-slate-800 p-3 rounded-xl opacity-30 transition-all">
+                    <span class="block text-[10px] text-slate-500 font-bold uppercase mb-2"><i class="fa-solid fa-camera mr-1"></i> Kamera_Bukti_Fisik.sys</span>
+                    <div class="relative aspect-video w-full bg-black rounded-lg overflow-hidden border border-slate-800 flex items-center justify-center">
+                        <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                        <canvas id="canvas-foto" class="w-full h-full object-cover hidden"></canvas>
+                        <div id="kamera-placeholder" class="text-slate-700 text-xs font-mono text-center px-4">
+                            <i class="fa-solid fa-video-slash text-2xl mb-1 block"></i> Menunggu Sesi Aktif
+                        </div>
+                    </div>
+                    <button id="btn-snap" onclick="ambilFotoBukti()" class="w-full mt-2 bg-slate-800 text-slate-500 text-xs font-bold py-2 rounded-lg transition-all border border-slate-700 cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-camera-retro mr-1"></i> Tangkap Foto Bukti
+                    </button>
+                </div>
+
+                <button onclick="bukaJendelaKonsekuensi()" class="w-full bg-slate-800 hover:bg-rose-950 border border-slate-700 hover:border-rose-800 text-slate-300 hover:text-rose-400 text-xs font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Ketentuan & Konsekuensi
+                </button>
+
+                <button id="btn-submit" onclick="submitDataAkhir()" class="w-full bg-slate-800 text-slate-600 border border-slate-700 font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-not-allowed" disabled>
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Submit Sesi Kerja
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="window-info" class="draggable-window hidden w-80 sm:w-96 bg-slate-900 border-2 border-amber-600 rounded-xl shadow-2xl overflow-hidden">
+        <div class="window-header bg-amber-950 px-4 py-2 flex justify-between items-center border-b border-amber-800">
+            <span class="text-xs text-amber-400 font-bold window-title"><i class="fa-solid fa-circle-info mr-1"></i> Sistem_Informasi.sys</span>
+            <button onclick="tutupWindow('window-info')" class="text-amber-400 hover:text-red-400 font-bold text-sm"><i class="fa-solid fa-square-xmark"></i></button>
+        </div>
+        <div class="content-area p-5 text-sm text-slate-300 space-y-3 bg-slate-950 max-h-80 overflow-y-auto">
+            <h4 class="font-bold text-white text-base">Apa itu SM4RTBIN</h4>
+            <p class="leading-relaxed text-xs text-slate-400">
+                SM4RTBIN adalah platform digital pos penjagaan pemilahan sampah sekolah yang terintegrasi dengan teknologi pemindaian <b>RFID Card</b> milik petugas serta validasi <b>QR Barcode</b> pada setiap tong sampah.
+            </p>
+        </div>
+    </div>
+
+    <div id="window-konsekuensi" class="draggable-window hidden w-80 sm:w-96 bg-slate-900 border-2 border-rose-600 rounded-xl shadow-2xl overflow-hidden">
+        <div class="window-header bg-rose-950 px-4 py-2 flex justify-between items-center border-b border-rose-800">
+            <span class="text-xs text-rose-400 font-bold window-title"><i class="fa-solid fa-shield-halved mr-1"></i> Regulasi_Konsekuensi.sys</span>
+            <button onclick="tutupWindow('window-konsekuensi')" class="text-rose-400 hover:text-red-400 font-bold text-sm"><i class="fa-solid fa-square-xmark"></i></button>
+        </div>
+        <div class="content-area p-5 text-sm text-slate-300 space-y-3 bg-slate-950">
+            <h4 class="font-bold text-rose-400 text-sm uppercase flex items-center gap-2"><i class="fa-solid fa-circle-exclamation"></i> Peringatan Kedisiplinan</h4>
+            <ul class="list-disc list-inside text-xs text-slate-400 space-y-1.5">
+                <li>Sesi absensi harian dianggap <span class="text-rose-400 font-bold">ALFA</span> jika pos ditinggalkan kosong.</li>
+                <li>Mendapatkan pengurangan poin penilaian kinerja kebersihan.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let aplikasiAktif = false;
+        let buffer = '';
+        let sesiId = null;
+        let streamKamera = null;
+        let blobFotoBukti = null;
+        
+        let penjaga1Id = null;
+        let penjaga2Id = null;
+        let peranP1 = null;
+        let peranP2 = null;
+        
+        let statusFocus = 'P1';
+
+        function tampilkanNotifikasi(pesan, kelasWarna) {
+            const notif = document.getElementById('notifikasi');
+            if (notif) {
+                notif.className = `p-3 rounded-lg border text-xs font-mono tracking-wide ${kelasWarna}`;
+                notif.innerText = `[LOG]: ${pesan}`;
+                notif.classList.remove('hidden');
+            }
+        }
+
+        function mulaiAplikasi() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('main-page').classList.remove('hidden');
+            aplikasiAktif = true;
+            resetForm();
+        }
+
+        function kembaliKeMenu() {
+            matikanKameraHardware();
+            document.getElementById('main-page').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+            tutupWindow('window-info');
+            tutupWindow('window-konsekuensi');
+            aplikasiAktif = false;
+        }
+
+        document.getElementById('rfid_p1').addEventListener('input', function() {
+            const btn = document.getElementById('btn-submit-p1-manual');
+            if (this.value.trim() !== "" && statusFocus === 'P1') btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        });
+
+        document.getElementById('rfid_p2').addEventListener('input', function() {
+            const btn = document.getElementById('btn-submit-p2-manual');
+            if (this.value.trim() !== "" && statusFocus === 'P2') btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        });
+
+        document.getElementById('barcode_tong').addEventListener('input', function() {
+            const btn = document.getElementById('btn-submit-tong-manual');
+            if (this.value.trim() !== "" && statusFocus === 'TONG') btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        });
+
+        document.getElementById('rfid_p1').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleManualInput(1); } });
+        document.getElementById('rfid_p2').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleManualInput(2); } });
+        document.getElementById('barcode_tong').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleTongManual(); } });
+
+        function handleManualInput(num) {
+            const val = document.getElementById(`rfid_p${num}`).value.trim();
+            if (val !== "") verifikasiRfidBackend(val, num);
+        }
+
+        function handleTongManual() {
+            const val = document.getElementById('barcode_tong').value.trim();
+            if (val !== "") {
+                kirimScanTongBackend(val);
+                document.getElementById('barcode_tong').value = '';
+                document.getElementById('btn-submit-tong-manual').classList.add('hidden');
+            }
+        }
+
+
+        window.addEventListener('keypress', function(e) {
+            if (!aplikasiAktif) return;
+            if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
+            if (e.key === 'Enter') {
+                if (buffer.trim() !== '') {
+                    if (statusFocus === 'P1') verifikasiRfidBackend(buffer.trim(), 1);
+                    else if (statusFocus === 'P2') verifikasiRfidBackend(buffer.trim(), 2);
+                    else if (statusFocus === 'TONG') kirimScanTongBackend(buffer.trim());
+                }
+                buffer = '';
+            } else {
+                buffer += e.key;
+            }
+        });
+
+        function verifikasiRfidBackend(uid, num) {
+            fetch('/api/scan-rfid/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rfid_uid: uid })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`Kartu Petugas ${num} tidak terdaftar!`);
+                return res.json();
+            })
+            .then(data => {
+                if (num === 1) penjaga1Id = data.penjaga_id;
+                else penjaga2Id = data.penjaga_id;
+
+                const inputEl = document.getElementById(`rfid_p${num}`);
+                inputEl.value = data.nama;
+                inputEl.setAttribute('readonly', 'true');
+                document.getElementById(`btn-submit-p${num}-manual`).classList.add('hidden');
+                
+                document.getElementById(`role-p${num}-options`).classList.remove('hidden');
+                tampilkanNotifikasi(`Petugas ${num} terverifikasi. Pilih Peran Tugas.`, "bg-blue-950 text-blue-400 border-blue-900");
+            })
+            .catch(err => {
+                tampilkanNotifikasi(err.message, "bg-rose-950 text-rose-400 border-rose-900");
+                buffer = '';
+            });
+        }
+
+        function setPeranTugas(num, role) {
+            const badge = document.getElementById(`badge-role-p${num}`);
+            badge.innerText = role.toUpperCase();
+            badge.classList.remove('hidden');
+            badge.className = `text-[9px] px-2 py-0.5 rounded font-bold ${role === 'Pencatat' ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'}`;
+
+            document.getElementById(`role-p${num}-options`).classList.add('hidden');
+
+            if (num === 1) {
+                peranP1 = role;
+                statusFocus = 'P2';
+                
+                const boxP2 = document.getElementById('box-p2');
+                boxP2.classList.remove('opacity-30');
+                boxP2.querySelector('label').className = "block text-[10px] text-emerald-500 font-bold uppercase tracking-wider";
+                
+                const inputP2 = document.getElementById('rfid_p2');
+                inputP2.removeAttribute('readonly');
+                inputP2.placeholder = "Scan / Ketik No RFID Petugas 2...";
+                tampilkanNotifikasi("Petugas 1 siap. Sekarang mohon verifikasi Petugas 2.", "bg-blue-950 text-blue-400 border-blue-900");
+            } else {
+                peranP2 = role;
+                buatSesiGabunganBackend();
+            }
+        }
+
+        function buatSesiGabunganBackend() {
+            fetch('/api/start-sesi/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    penjaga_id: penjaga1Id, 
+                    penjaga2_id: penjaga2Id,
+                    role_p1: peranP1,
+                    role_p2: peranP2 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                sesiId = data.sesi_id;
+                statusFocus = 'TONG';
+                
+                document.getElementById('card-tong').classList.remove('opacity-30');
+                const inputTong = document.getElementById('barcode_tong');
+                inputTong.removeAttribute('readonly');
+                inputTong.placeholder = "Scan / Ketik Kode Barcode Tong...";
+                
+               
+                aktifkanKameraHardware();
+
+                tampilkanNotifikasi("Sesi Tim Aktif! Kamera Menyala. Silakan mulai pendataan Tong Sampah.", "bg-emerald-950 text-emerald-400 border-emerald-900");
+            });
+        }
+
+        function aktifkanKameraHardware() {
+            const video = document.getElementById('video-feed');
+            const placeholder = document.getElementById('kamera-placeholder');
+            const btnSnap = document.getElementById('btn-snap');
+            const boxKamera = document.getElementById('box-kamera');
+
+            boxKamera.classList.remove('opacity-30');
+
+            navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+            .then(stream => {
+                streamKamera = stream;
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+              
+                btnSnap.removeAttribute('disabled');
+                btnSnap.className = "w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition-all border border-indigo-400 shadow cursor-pointer";
+            })
+            .catch(err => {
+                placeholder.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 text-2xl mb-1 block"></i> Izin Akses Kamera Ditolak`;
+                console.error("Gagal mendeteksi kamera: ", err);
+            });
+        }
+
+        function ambilFotoBukti() {
+            const video = document.getElementById('video-feed');
+            const canvas = document.getElementById('canvas-foto');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+
+            canvas.toBlob(blob => {
+                blobFotoBukti = blob;
+                
+                const btnSubmit = document.getElementById('btn-submit');
+                btnSubmit.removeAttribute('disabled');
+                btnSubmit.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow cursor-pointer";
+                
+                tampilkanNotifikasi("Foto bukti fisik berhasil dikunci! Sesi siap dikirim.", "bg-emerald-950 text-emerald-400 border-emerald-900");
+            }, 'image/jpeg', 0.9);
+        }
+
+        function matikanKameraHardware() {
+            if (streamKamera) {
+                streamKamera.getTracks().forEach(track => track.stop());
+                streamKamera = null;
+            }
+        }
+
+        function kirimScanTongBackend(qrCode) {
+            if (!sesiId) return;
+            fetch('/api/scan-tong/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sesi_id: sesiId, qr_code: qrCode })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' || data.status === 'warning') {
+                    document.getElementById('counter-tong').innerText = data.total_dipilah || document.getElementById('counter-tong').innerText;
+                    if(data.status === 'warning') tampilkanNotifikasi(data.message, "bg-amber-950 text-amber-400 border-amber-900");
+                    else tampilkanNotifikasi(data.message, "bg-emerald-950 text-emerald-400 border-emerald-900");
+                }
+            });
+        }
+
+        
+async function submitDataAkhir() {
+    if(!blobFotoBukti) {
+        alert("Wajib mengambil foto bukti fisik sebelum menutup sesi!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('sesi_id', sesiId);
+    formData.append('foto_bukti', blobFotoBukti, 'bukti_sesi_penjagaan.jpg'); 
+    try {
+        const response = await fetch('/api/submit-sesi/', { method: 'POST', body: formData });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            matikanKameraHardware();
+            
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            } else {
+                window.location.href = '/api/sukses/';
+            }
+            } else {
+                 tampilkanNotifikasi(data.message || "Gagal memproses pengiriman data.", "bg-rose-950 text-rose-400 border-rose-900");
+            }
+        } catch (err) {
+        tampilkanNotifikasi("Gagal sinkronisasi data ke server.", "bg-rose-950 text-rose-400 border-rose-900");
+    }
+}
+
+        function resetForm() {
+            sesiId = null; penjaga1Id = null; penjaga2Id = null; peranP1 = null; peranP2 = null; blobFotoBukti = null; buffer = ''; statusFocus = 'P1';
+            matikanKameraHardware();
+
+            document.getElementById('video-feed').classList.add('hidden');
+            document.getElementById('canvas-foto').classList.add('hidden');
+            document.getElementById('kamera-placeholder').classList.remove('hidden');
+            document.getElementById('box-kamera').classList.add('opacity-30');
+            
+            const btnSnap = document.getElementById('btn-snap');
+            btnSnap.setAttribute('disabled', 'true');
+            btnSnap.className = "w-full mt-2 bg-slate-800 text-slate-500 text-xs font-bold py-2 rounded-lg transition-all border border-slate-700 cursor-not-allowed";
+
+            const rfid1 = document.getElementById('rfid_p1'); rfid1.value = ''; rfid1.removeAttribute('readonly'); rfid1.placeholder = "Scan / Ketik No RFID...";
+            document.getElementById('badge-role-p1').classList.add('hidden');
+            document.getElementById('role-p1-options').classList.add('hidden');
+            document.getElementById('btn-submit-p1-manual').classList.add('hidden');
+            
+            const rfid2 = document.getElementById('rfid_p2'); rfid2.value = ''; rfid2.setAttribute('readonly', 'true'); rfid2.placeholder = "Menunggu Petugas 1...";
+            document.getElementById('badge-role-p2').classList.add('hidden');
+            document.getElementById('role-p2-options').classList.add('hidden');
+            document.getElementById('btn-submit-p2-manual').classList.add('hidden');
+            document.getElementById('box-p2').classList.add('opacity-30');
+
+            const tong = document.getElementById('barcode_tong'); tong.value = ''; tong.setAttribute('readonly', 'true'); tong.placeholder = "Menunggu verifikasi kedua petugas...";
+            document.getElementById('card-tong').classList.add('opacity-30');
+            document.getElementById('btn-submit-tong-manual').classList.add('hidden');
+            document.getElementById('counter-tong').innerText = '0';
+            
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.setAttribute('disabled', 'true');
+            btnSubmit.className = "w-full bg-slate-800 text-slate-600 border border-slate-700 font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-not-allowed";
+            
+            tampilkanNotifikasi('Silakan isi RFID Petugas 1 untuk memulai...', 'bg-slate-900 text-slate-400 border-slate-800');
+        }
+
+        makeElementsDraggable();
+        function makeElementsDraggable() {
+            const windows = document.querySelectorAll('.draggable-window');
+            windows.forEach(win => {
+                const header = win.querySelector('.window-header');
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                header.onmousedown = dragMouseDown;
+                function dragMouseDown(e) { e = e || window.event; e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; }
+                function elementDrag(e) { e = e || window.event; e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY; win.style.top = (win.offsetTop - pos2) + "px"; win.style.left = (win.offsetLeft - pos1) + "px"; }
+                function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+            });
+        }
+        function bukaJendelaInfo() { const win = document.getElementById('window-info'); win.classList.remove('hidden'); win.style.top = "20%"; win.style.left = "30%"; }
+        function bukaJendelaKonsekuensi() { const win = document.getElementById('window-konsekuensi'); win.classList.remove('hidden'); win.style.top = "30%"; win.style.left = "50%"; }
+        function tutupWindow(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>
