@@ -1,12 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 import json
 from .models import Penjaga, TongSampah, SesiAbsensi, LogPemilahan
 
 def index(request):
     return render(request, 'penjaga/index.html')
+
+def absensi_sukses(request):
+    return render(request, 'penjaga/terimakasih.html')
 
 @csrf_exempt
 def scan_rfid(request):
@@ -105,7 +109,11 @@ def submit_sesi(request):
             sesi.is_submitted = True
             sesi.save()
             
-            return JsonResponse({'status': 'success', 'message': 'Absensi berhasil disubmit! Terima kasih.'})
+            return JsonResponse({
+                'status': 'success', 
+                'message': 'Absensi berhasil disubmit! Terima kasih.',
+                'redirect_url': reverse('absensi_sukses')
+            })
         except SesiAbsensi.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Sesi tidak ditemukan.'}, status=404)
         except Exception as e:
